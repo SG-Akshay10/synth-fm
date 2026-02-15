@@ -68,15 +68,34 @@ with st.sidebar:
         st.info("First run will download model weights.")
         
         # Load model immediately if local selected
-        if st.checkbox("Load Model", value=True):
+        # Button to trigger model loading
+        if "loaded_model_name" not in st.session_state:
+            st.session_state.loaded_model_name = None
+            
+        if st.button("Load Model"):
             with st.spinner(f"Loading {model_name}..."):
                 pipe = get_local_model_pipeline(model_name)
                 if pipe:
-                    st.success("Model Loaded")
-                    llm_config["local_pipeline"] = pipe
+                    st.session_state.local_pipeline = pipe
+                    st.session_state.loaded_model_name = model_name
                 else:
                     st.error("Failed to load model")
+
+        # Persist pipeline if loaded and matches selected model
+        if st.session_state.get("local_pipeline") and st.session_state.loaded_model_name == model_name:
+            st.success(f"Model Loaded: {model_name}")
+            llm_config["local_pipeline"] = st.session_state.local_pipeline
+        elif st.session_state.get("local_pipeline"):
+             st.warning(f"Loaded: {st.session_state.loaded_model_name}. Click 'Load Model' to switch to {model_name}.")
     
+    st.subheader("🗣️ Audio Configuration")
+    tts_model = st.radio(
+        "TTS Model",
+        options=["edge", "kokoro"],
+        format_func=lambda x: "Edge TTS (Fast)" if x == "edge" else "Kokoro (High Quality)",
+        index=0
+    )
+
     st.divider()
     
     duration = st.select_slider(
@@ -241,8 +260,8 @@ if st.session_state.extracted_content:
             st.header("4. Generate Audio")
             
             if st.button("🗣️ Synthesize Audio", type="primary"):
-                with st.spinner("Synthesizing audio segments..."):
-                    audio_paths = batch_synthesize_audio(script)
+                with st.spinner(f"Synthesizing audio segments using {tts_model}..."):
+                    audio_paths = batch_synthesize_audio(script, model=tts_model)
                     st.session_state.audio_segments = audio_paths
             
             if st.session_state.audio_segments:

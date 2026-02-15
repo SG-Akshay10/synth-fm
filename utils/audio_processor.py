@@ -19,7 +19,7 @@ def create_podcast(audio_segments: list[str], output_filename: str = "final_podc
     
     for i, segment_path in enumerate(audio_segments):
         try:
-            segment = AudioSegment.from_mp3(segment_path)
+            segment = AudioSegment.from_file(segment_path)
             
             if i == 0:
                 combined += segment
