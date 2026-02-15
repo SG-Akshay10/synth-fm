@@ -9,7 +9,8 @@ from utils.llm import (
     MODEL_GEMINI_FLASH,
     MODEL_GEMINI_PRO,
     MODEL_LOCAL_3B,
-    MODEL_LOCAL_1B
+    MODEL_LOCAL_1B,
+    unload_local_model
 )
 
 # Apply nest_asyncio to allow async loop in Streamlit
@@ -45,7 +46,7 @@ with st.sidebar:
     provider = st.radio(
         "Select Provider",
         options=[PROVIDER_OPENAI, PROVIDER_GEMINI, PROVIDER_LOCAL],
-        index=1 # Default to Gemini
+        index=2 # Default to Local
     )
     
     llm_config = {"provider": provider}
@@ -63,7 +64,7 @@ with st.sidebar:
         llm_config["model_name"] = model_name
         
     elif provider == PROVIDER_LOCAL:
-        model_name = st.selectbox("Local Model", [MODEL_LOCAL_3B, MODEL_LOCAL_1B])
+        model_name = st.selectbox("Local Model", [MODEL_LOCAL_1B,MODEL_LOCAL_3B])
         llm_config["model_name"] = model_name
         st.info("First run will download model weights.")
         
@@ -87,14 +88,6 @@ with st.sidebar:
             llm_config["local_pipeline"] = st.session_state.local_pipeline
         elif st.session_state.get("local_pipeline"):
              st.warning(f"Loaded: {st.session_state.loaded_model_name}. Click 'Load Model' to switch to {model_name}.")
-    
-    st.subheader("🗣️ Audio Configuration")
-    tts_model = st.radio(
-        "TTS Model",
-        options=["edge", "kokoro"],
-        format_func=lambda x: "Edge TTS (Fast)" if x == "edge" else "Kokoro (High Quality)",
-        index=0
-    )
 
     st.divider()
     
@@ -105,7 +98,6 @@ with st.sidebar:
         format_func=lambda x: f"{x} Minutes"
     )
     
-    st.info(f"Target Length: ~{300 if duration==2 else 450 if duration==3 else 750} words ({150 * duration} wpm)")
 
     st.divider()
     st.markdown("### 🛠️ Instructions")
@@ -260,7 +252,14 @@ if st.session_state.extracted_content:
             st.header("4. Generate Audio")
             
             if st.button("🗣️ Synthesize Audio", type="primary"):
-                with st.spinner(f"Synthesizing audio segments using {tts_model}..."):
+                # Unload local model if provider is local to free up memory for TTS
+                if provider == PROVIDER_LOCAL:
+                    smi_output = unload_local_model()
+                    if smi_output:
+                        with st.expander("📊 NVIDIA GPU Status (After Unload)", expanded=False):
+                            st.code(smi_output)
+                    
+                with st.spinner("Synthesizing audio segments using Kokoro..."):
                     audio_paths = batch_synthesize_audio(script, model=tts_model)
                     st.session_state.audio_segments = audio_paths
             
@@ -284,8 +283,8 @@ if st.session_state.extracted_content:
                     
                     with open(st.session_state.final_audio_path, "rb") as f:
                         st.download_button(
-                            label="📥 Download Podcast (MP3)",
+                            label="📥 Download Podcast (WAV)",
                             data=f,
-                            file_name="synth_fm_podcast.mp3",
-                            mime="audio/mpeg"
+                            file_name="synth_fm_podcast.wav",
+                            mime="audio/wav"
                         )

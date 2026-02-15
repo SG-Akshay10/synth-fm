@@ -1,4 +1,7 @@
 import os
+import gc
+import subprocess
+
 import streamlit as st
 from openai import OpenAI
 import google.generativeai as genai
@@ -6,7 +9,7 @@ import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 from huggingface_hub import login
 
-# Constants
+# ... existing constants ...
 PROVIDER_OPENAI = "OpenAI"
 PROVIDER_GEMINI = "Gemini"
 PROVIDER_LOCAL = "Local LLM"
@@ -50,7 +53,40 @@ def get_local_model_pipeline(model_id):
         st.error(f"Error loading local model {model_id}: {e}")
         return None
 
+def unload_local_model():
+    """Unloads the local model from memory and clears CUDA cache."""
+    # Clear streamlit cache for the model loading function
+    get_local_model_pipeline.clear()
+    
+    # Remove from session state if it exists
+    if "local_pipeline" in st.session_state:
+        del st.session_state.local_pipeline
+    
+    if "loaded_model_name" in st.session_state:
+        st.session_state.loaded_model_name = None
+        
+    # Force garbage collection
+    gc.collect()
+    
+    # Clear CUDA cache if applicable
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+    
+    st.info("Local LLM unloaded to free up memory for TTS.")
+    
+    # Run nvidia-smi to check VRAM
+    try:
+        result = subprocess.run(["nvidia-smi"], capture_output=True, text=True)
+        if result.returncode == 0:
+            return result.stdout
+        else:
+            return f"Error running nvidia-smi: {result.stderr}"
+    except Exception as e:
+        return f"Failed to run nvidia-smi: {e}"
+
 def query_llm(messages: list[dict], provider: str, model_name: str, api_key: str = None, local_pipeline = None) -> str:
+# ... rest of the file ...
+
     """Unified interface for querying LLMs."""
     
     if provider == PROVIDER_OPENAI:
