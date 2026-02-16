@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Play, Pause, Download, Volume2, SkipBack, SkipForward } from 'lucide-react';
 import { GlassCard } from '../ui/GlassCard';
 import { motion } from 'framer-motion';
+import { API_BASE_URL } from '../../lib/config';
 
 export const AudioPlayer = ({ audioPath, onDownload }) => {
     const audioRef = useRef(null);
@@ -69,7 +70,7 @@ export const AudioPlayer = ({ audioPath, onDownload }) => {
 
                             {/* Download Button (Desktop) */}
                             <a
-                                href={`http://localhost:8000/api/audio/download-podcast?path=${audioPath}`}
+                                href={`${API_BASE_URL}/audio/download-podcast?path=${audioPath}`}
                                 download="podcast.wav"
                                 className="hidden md:flex items-center gap-2 px-4 py-2 bg-white text-black font-semibold rounded-lg hover:bg-gray-200 transition-colors"
                             >
@@ -123,7 +124,7 @@ export const AudioPlayer = ({ audioPath, onDownload }) => {
                     </div>
 
                     <a
-                        href={`http://localhost:8000/api/audio/download-podcast?path=${audioPath}`}
+                        href={`${API_BASE_URL}/audio/download-podcast?path=${audioPath}`}
                         download="podcast.wav"
                         className="md:hidden flex items-center gap-2 px-4 py-2 bg-white/10 text-white font-medium rounded-lg hover:bg-white/20 transition-colors text-sm"
                     >
@@ -134,7 +135,7 @@ export const AudioPlayer = ({ audioPath, onDownload }) => {
 
                 <audio
                     ref={audioRef}
-                    src={`http://localhost:8000/api/audio/download-podcast?path=${audioPath}`}
+                    src={`${API_BASE_URL}/audio/download-podcast?path=${audioPath}`}
                     onTimeUpdate={handleTimeUpdate}
                     onEnded={() => setIsPlaying(false)}
                     onLoadedMetadata={handleTimeUpdate}

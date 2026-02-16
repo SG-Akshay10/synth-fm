@@ -5,8 +5,7 @@ import { ContentInput } from '../components/features/ContentInput'
 import { ScriptReview } from '../components/features/ScriptReview'
 import { AudioPlayer } from '../components/features/AudioPlayer'
 import { Loader2 } from 'lucide-react'
-
-const API_BASE_URL = "http://localhost:8000/api"
+import { API_BASE_URL } from '../lib/config'
 
 export const PodcastGenerator = () => {
     // Configuration State

@@ -116,7 +116,7 @@ export const LandingPage = () => {
 
                 {/* Footerish area */}
                 <div className="mt-32 border-t border-white/5 pt-12 text-center text-white/30 text-sm">
-                    <p>&copy; 2026 Synth-FM. Built with ❤️ and AI.</p>
+                    <p>&copy; 2026 Synth-FM</p>
                 </div>
             </main>
         </div>
