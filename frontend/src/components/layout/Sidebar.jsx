@@ -207,22 +207,28 @@ export const Sidebar = ({ config, onConfigChange, onModelLoad, onModelUnload, mo
                     <div className="space-y-2 pt-2">
                         <label className="text-xs text-white/40 font-medium ml-1">Speaker Details</label>
                         {speakers.map((speaker, idx) => (
-                            <div key={idx} className="flex gap-2 p-1.5 rounded-lg bg-white/5 border border-white/5 focus-within:border-white/10 transition-colors">
-                                <input
-                                    value={speaker.name}
-                                    onChange={(e) => handleSpeakerChange(idx, 'name', e.target.value)}
-                                    className="w-full bg-transparent border-none text-xs text-white focus:outline-none placeholder:text-white/20 pl-2"
-                                    placeholder="Name"
-                                />
-                                <div className="w-px bg-white/10 my-1" />
-                                <select
-                                    value={speaker.gender}
-                                    onChange={(e) => handleSpeakerChange(idx, 'gender', e.target.value)}
-                                    className="bg-transparent border-none text-xs text-white/60 focus:outline-none cursor-pointer hover:text-white pr-1"
-                                >
-                                    <option value="Male" className="bg-[#07001F]">M</option>
-                                    <option value="Female" className="bg-[#07001F]">F</option>
-                                </select>
+                            <div key={idx} className="flex gap-2 items-center">
+                                <div className="flex-1 flex gap-2 p-1.5 rounded-lg bg-white/5 border border-white/5 focus-within:border-white/10 transition-colors">
+                                    <input
+                                        value={speaker.name}
+                                        onChange={(e) => handleSpeakerChange(idx, 'name', e.target.value)}
+                                        className="w-full bg-transparent border-none text-xs text-white focus:outline-none placeholder:text-white/20 pl-2"
+                                        placeholder="Name"
+                                    />
+                                </div>
+                                <div className="relative w-24">
+                                    <select
+                                        value={speaker.gender}
+                                        onChange={(e) => handleSpeakerChange(idx, 'gender', e.target.value)}
+                                        className="w-full appearance-none bg-white/5 border border-white/5 rounded-lg text-xs text-white/80 focus:outline-none focus:border-primary/30 py-1.5 pl-3 pr-6 cursor-pointer hover:bg-white/10 transition-colors"
+                                    >
+                                        <option value="Male" className="bg-[#07001F]">Male</option>
+                                        <option value="Female" className="bg-[#07001F]">Female</option>
+                                    </select>
+                                    <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-white/40">
+                                        <Box size={10} />
+                                    </div>
+                                </div>
                             </div>
                         ))}
                     </div>

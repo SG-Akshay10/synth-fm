@@ -4,6 +4,33 @@ import { GlassCard } from '../ui/GlassCard';
 import { GradientButton } from '../ui/GradientButton';
 import { motion } from 'framer-motion';
 
+const SPEAKER_COLORS = [
+    {
+        bg: 'bg-blue-600',
+        text: 'text-white',
+        border: 'border-blue-400',
+        bubble: 'bg-blue-900/60 border-blue-500/30 text-white'
+    },
+    {
+        bg: 'bg-green-600',
+        text: 'text-white',
+        border: 'border-green-400',
+        bubble: 'bg-green-900/60 border-green-500/30 text-white'
+    },
+    {
+        bg: 'bg-red-600',
+        text: 'text-white',
+        border: 'border-red-400',
+        bubble: 'bg-red-900/60 border-red-500/30 text-white'
+    },
+    {
+        bg: 'bg-orange-600',
+        text: 'text-white',
+        border: 'border-orange-400',
+        bubble: 'bg-orange-900/60 border-orange-500/30 text-white'
+    }
+];
+
 export const ScriptReview = ({ content, script, onGenerateScript, onSynthesize, loading, speakers }) => {
     return (
         <div className="space-y-6">
@@ -57,26 +84,30 @@ export const ScriptReview = ({ content, script, onGenerateScript, onSynthesize, 
 
                     <div className="space-y-4 mb-8 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
                         {script.dialogue.map((turn, i) => {
-                            const isSpeaker1 = turn.speaker === speakers[0].name;
+                            const speakerIndex = speakers.findIndex(s => s.name === turn.speaker);
+                            const colorTheme = SPEAKER_COLORS[speakerIndex % SPEAKER_COLORS.length] || SPEAKER_COLORS[0];
+                            const isOdd = i % 2 !== 0; // Alternating sides for visual flow, or keep all left?
+                            // Let's keep the left/right alternation based on speaker index for clear separation
+                            const isRight = speakerIndex % 2 !== 0;
+
                             return (
                                 <motion.div
-                                    initial={{ opacity: 0, x: isSpeaker1 ? -10 : 10 }}
+                                    initial={{ opacity: 0, x: isRight ? 10 : -10 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: i * 0.05 }}
                                     key={i}
-                                    className={`flex gap-4 ${isSpeaker1 ? 'flex-row' : 'flex-row-reverse'}`}
+                                    className={`flex gap-4 ${isRight ? 'flex-row-reverse' : 'flex-row'}`}
                                 >
                                     <div className={`
                        w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0
-                       ${isSpeaker1 ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-pink-500/20 text-pink-300 border border-pink-500/30'}
+                       ${colorTheme.bg} ${colorTheme.text} border ${colorTheme.border}
                     `}>
                                         {turn.speaker.charAt(0)}
                                     </div>
                                     <div className={`
-                       flex-1 p-3 rounded-2xl text-sm leading-relaxed
-                       ${isSpeaker1
-                                            ? 'bg-white/5 rounded-tl-none border border-white/5 text-gray-200'
-                                            : 'bg-gradient-to-br from-purple-900/20 to-blue-900/20 rounded-tr-none border border-white/10 text-gray-100'}
+                       flex-1 p-3 rounded-2xl text-sm leading-relaxed border
+                       ${colorTheme.bubble}
+                       ${isRight ? 'rounded-tr-none' : 'rounded-tl-none'}
                     `}>
                                         <div className="text-xs font-semibold mb-1 opacity-50">{turn.speaker}</div>
                                         {turn.text}

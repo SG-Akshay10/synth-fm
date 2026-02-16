@@ -48,82 +48,99 @@ export const AudioPlayer = ({ audioPath, onDownload }) => {
 
     return (
         <motion.div
-            initial={{ y: 50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-6 pt-2"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="w-full"
         >
-            <div className="max-w-3xl mx-auto">
-                <GlassCard className="!p-4 bg-black/60 backdrop-blur-xl border-violet-500/20 shadow-2xl shadow-violet-900/20">
-                    <audio
-                        ref={audioRef}
-                        src={`http://localhost:8000/api/audio/download-podcast?path=${audioPath}`}
-                        onTimeUpdate={handleTimeUpdate}
-                        onEnded={() => setIsPlaying(false)}
-                        onLoadedMetadata={handleTimeUpdate}
-                        autoPlay
-                    />
+            <GlassCard className="!p-0 overflow-hidden bg-black/40 backdrop-blur-xl border-violet-500/20 shadow-2xl shadow-violet-900/20">
+                <div className="p-6 md:p-8 flex flex-col md:flex-row items-center gap-6">
 
-                    <div className="flex items-center gap-4">
-                        {/* Info */}
-                        <div className="hidden sm:block w-32">
-                            <div className="text-sm font-medium text-white truncate">Final Podcast</div>
-                            <div className="text-xs text-gray-400">Synth-FM</div>
-                        </div>
+                    {/* Icon/Art Placeholder */}
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 flex items-center justify-center border border-white/10 shrink-0">
+                        <Volume2 size={32} className="text-white/80" />
+                    </div>
 
-                        {/* Controls */}
-                        <div className="flex-1 flex flex-col items-center gap-2">
-                            <div className="flex items-center gap-4">
-                                <button onClick={() => audioRef.current.currentTime -= 10} className="text-gray-400 hover:text-white transition-colors"><SkipBack size={20} /></button>
-                                <button
-                                    onClick={togglePlay}
-                                    className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-transform"
-                                >
-                                    {isPlaying ? <Pause size={20} fill="currentColor" /> : <Play size={20} fill="currentColor" className="ml-1" />}
-                                </button>
-                                <button onClick={() => audioRef.current.currentTime += 10} className="text-gray-400 hover:text-white transition-colors"><SkipForward size={20} /></button>
+                    <div className="flex-1 w-full space-y-4">
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <h3 className="text-xl font-bold text-white">Final Podcast</h3>
+                                <p className="text-sm text-gray-400">Synth-FM • Generated Audio</p>
                             </div>
 
-                            {/* Progress Bar */}
-                            <div className="w-full flex items-center gap-2 text-xs text-gray-400 font-mono">
-                                <span>{currentTime}</span>
-                                <div
-                                    className="flex-1 h-1 bg-white/10 rounded-full cursor-pointer relative group"
-                                    onClick={handleSeek}
-                                >
-                                    <div
-                                        className="absolute top-0 left-0 h-full bg-violet-500 rounded-full group-hover:bg-violet-400 transition-colors"
-                                        style={{ width: `${progress}%` }}
-                                    />
-                                </div>
-                                <span>{duration}</span>
-                            </div>
-                        </div>
-
-                        {/* Actions */}
-                        <div className="flex items-center gap-2 w-32 justify-end">
-                            <div className="group relative hidden sm:flex items-center gap-2">
-                                <Volume2 size={18} className="text-gray-400" />
-                                <input
-                                    type="range" min="0" max="1" step="0.1"
-                                    onChange={(e) => {
-                                        setVolume(e.target.value);
-                                        audioRef.current.volume = e.target.value;
-                                    }}
-                                    className="w-16 h-1 bg-gray-700 rounded-lg accent-white"
-                                />
-                            </div>
+                            {/* Download Button (Desktop) */}
                             <a
                                 href={`http://localhost:8000/api/audio/download-podcast?path=${audioPath}`}
                                 download="podcast.wav"
-                                className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                                className="hidden md:flex items-center gap-2 px-4 py-2 bg-white text-black font-semibold rounded-lg hover:bg-gray-200 transition-colors"
                             >
-                                <Download size={20} />
+                                <Download size={18} />
+                                Download WAV
                             </a>
                         </div>
 
+                        <div className="flex items-center gap-4">
+                            <button onClick={() => audioRef.current.currentTime -= 10} className="text-gray-400 hover:text-white transition-colors"><SkipBack size={20} /></button>
+                            <button
+                                onClick={togglePlay}
+                                className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-transform shadow-lg shadow-white/20"
+                            >
+                                {isPlaying ? <Pause size={24} fill="currentColor" /> : <Play size={24} fill="currentColor" className="ml-1" />}
+                            </button>
+                            <button onClick={() => audioRef.current.currentTime += 10} className="text-gray-400 hover:text-white transition-colors"><SkipForward size={20} /></button>
+
+                            {/* Progress & Time */}
+                            <div className="flex-1 flex flex-col gap-1">
+                                <div
+                                    className="h-1.5 bg-white/10 rounded-full cursor-pointer relative group"
+                                    onClick={handleSeek}
+                                >
+                                    <div
+                                        className="absolute top-0 left-0 h-full bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-full group-hover:from-violet-400 group-hover:to-fuchsia-400 transition-all"
+                                        style={{ width: `${progress}%` }}
+                                    />
+                                </div>
+                                <div className="flex justify-between text-xs text-gray-500 font-mono">
+                                    <span>{currentTime}</span>
+                                    <span>{duration}</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </GlassCard>
-            </div>
+                </div>
+
+                {/* Mobile Download/Volume Footer */}
+                <div className="bg-white/5 border-t border-white/5 p-4 flex items-center justify-between md:justify-end gap-4">
+                    <div className="flex items-center gap-2 flex-1 md:flex-none md:w-48">
+                        <Volume2 size={16} className="text-gray-400" />
+                        <input
+                            type="range" min="0" max="1" step="0.1"
+                            onChange={(e) => {
+                                setVolume(e.target.value);
+                                audioRef.current.volume = e.target.value;
+                            }}
+                            className="w-full h-1 bg-gray-700 rounded-lg accent-white appearance-none cursor-pointer"
+                        />
+                    </div>
+
+                    <a
+                        href={`http://localhost:8000/api/audio/download-podcast?path=${audioPath}`}
+                        download="podcast.wav"
+                        className="md:hidden flex items-center gap-2 px-4 py-2 bg-white/10 text-white font-medium rounded-lg hover:bg-white/20 transition-colors text-sm"
+                    >
+                        <Download size={16} />
+                        Download
+                    </a>
+                </div>
+
+                <audio
+                    ref={audioRef}
+                    src={`http://localhost:8000/api/audio/download-podcast?path=${audioPath}`}
+                    onTimeUpdate={handleTimeUpdate}
+                    onEnded={() => setIsPlaying(false)}
+                    onLoadedMetadata={handleTimeUpdate}
+                    autoPlay
+                />
+            </GlassCard>
         </motion.div>
     );
 };
