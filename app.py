@@ -293,7 +293,7 @@ if st.session_state.extracted_content:
                             st.code(smi_output)
                     
                 with st.spinner("Synthesizing audio segments using Kokoro..."):
-                    audio_paths = batch_synthesize_audio(script)
+                    audio_paths = batch_synthesize_audio(script,unique_speakers)
                     st.session_state.audio_segments = audio_paths
             
             if st.session_state.audio_segments:

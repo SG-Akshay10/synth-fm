@@ -5,14 +5,6 @@ from kokoro import KPipeline
 import torch
 from pathlib import Path
 
-# Voice Mapping for Kokoro
-KOKORO_VOICES = {
-    "Alex": "af_heart",
-    "Bailey": "am_adam",
-    "Casey": "af_bella",
-    "Drew": "am_michael"
-}
-
 TEMP_DIR = Path("data/temp")
 TEMP_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -26,14 +18,16 @@ def get_kokoro_pipeline():
         _KOKORO_PIPELINE = KPipeline(lang_code='a')
     return _KOKORO_PIPELINE
 
-def synthesize_segment_kokoro(segment_index: int, speaker: str, text: str) -> str:
+# Default voices for dynamic mapping
+VOICE_LIST = ["af_heart", "am_adam", "af_bella", "am_michael"]
+
+def synthesize_segment_kokoro(segment_index: int, speaker: str, text: str, voice_id: str) -> str:
     """Synthesize a single audio segment using Kokoro TTS (Sync)."""
     try:
         pipeline = get_kokoro_pipeline()
-        voice = KOKORO_VOICES.get(speaker, "af_heart")
         
         # Kokoro returns a generator
-        generator = pipeline(text, voice=voice, speed=1)
+        generator = pipeline(text, voice=voice_id, speed=1)
         
         all_audio = []
         for _, _, audio in generator:
@@ -55,13 +49,24 @@ def synthesize_segment_kokoro(segment_index: int, speaker: str, text: str) -> st
         print(f"Error synthesizing segment {segment_index} (Kokoro): {e}")
         return None
 
-def batch_synthesize_audio(script: dict) -> list[str]:
+def batch_synthesize_audio(script: dict, unique_speakers: list[str]) -> list[str]:
     """Process all dialogue segments sequentially for Kokoro."""
     dialogue = script.get("dialogue", [])
     results = []
     
+    # Create a mapping from speaker name to voice_id
+    # We take the first N voices from VOICE_LIST where N is the number of unique speakers
+    voice_mapping = {
+        name: VOICE_LIST[i % len(VOICE_LIST)] 
+        for i, name in enumerate(unique_speakers)
+    }
+    
     for i, turn in enumerate(dialogue):
-        path = synthesize_segment_kokoro(i, turn.get("speaker"), turn.get("text"))
+        speaker = turn.get("speaker")
+        text = turn.get("text")
+        voice_id = voice_mapping.get(speaker, VOICE_LIST[0])
+        
+        path = synthesize_segment_kokoro(i, speaker, text, voice_id)
         if path:
             results.append(path)
             
