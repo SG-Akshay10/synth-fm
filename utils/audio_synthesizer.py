@@ -55,7 +55,7 @@ def synthesize_segment_kokoro(segment_index: int, speaker: str, text: str) -> st
         print(f"Error synthesizing segment {segment_index} (Kokoro): {e}")
         return None
 
-def batch_synthesize_audio(script: dict, model: str = "kokoro") -> list[str]:
+def batch_synthesize_audio(script: dict) -> list[str]:
     """Process all dialogue segments sequentially for Kokoro."""
     dialogue = script.get("dialogue", [])
     results = []

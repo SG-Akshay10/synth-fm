@@ -64,7 +64,7 @@ with st.sidebar:
         llm_config["model_name"] = model_name
         
     elif provider == PROVIDER_LOCAL:
-        model_name = st.selectbox("Local Model", [MODEL_LOCAL_1B,MODEL_LOCAL_3B])
+        model_name = st.selectbox("Local Model", [MODEL_LOCAL_3B,MODEL_LOCAL_1B])
         llm_config["model_name"] = model_name
         st.info("First run will download model weights.")
         
@@ -97,6 +97,25 @@ with st.sidebar:
         value=2,
         format_func=lambda x: f"{x} Minutes"
     )
+    
+    num_speakers = st.slider(
+        "Number of Speakers",
+        min_value=2,
+        max_value=4,
+        value=2,
+        help="Select between 2 to 4 speakers for the podcast."
+    )
+    
+    st.divider()
+    st.subheader("📝 Podcast Details")
+    podcast_name = st.text_input("Podcast Name", value="Synth-FM")
+    
+    st.caption("Speaker Names")
+    speaker_names = []
+    default_names = ["Alex", "Bailey", "Casey", "Devin"]
+    for i in range(num_speakers):
+        name = st.text_input(f"Speaker {i+1}", value=default_names[i], key=f"speaker_name_{i}")
+        speaker_names.append(name)
     
 
     st.divider()
@@ -225,7 +244,7 @@ if st.session_state.extracted_content:
                     st.info("ℹ️ Large content detected. Automatic summarization enabled (this may take a moment).")
                     
                 with st.spinner(f"Generating script using {provider}..."):
-                    script = generate_script(final_content, duration, llm_config)
+                    script = generate_script(final_content, duration, llm_config, num_speakers, podcast_name, speaker_names)
                     st.session_state.generated_script = script
         
         # Display Script
@@ -238,12 +257,26 @@ if st.session_state.extracted_content:
                 st.success(f"✅ Script Generated: {script.get('title', 'Podcast')}")
                 
                 with st.expander("View Script", expanded=True):
+                    # Create a tuple of unique speakers from the dialogue
+                    unique_speakers = []
                     for turn in script.get("dialogue", []):
-                        speaker = turn.get("speaker", "Unknown")
+                        s = turn.get("speaker")
+                        if s and s not in unique_speakers:
+                            unique_speakers.append(s)
+                    speaker_names_tuple = tuple(unique_speakers)
+                    
+                    for turn in script.get("dialogue", []):
+                        speaker = turn.get("speaker") or "Unknown"
                         text = turn.get("text", "")
                         
-                        # Simple color coding
-                        color = "blue" if "Alex" in speaker else "green" if "Bailey" in speaker else "orange"
+                        # Map speaker to color based on index
+                        try:
+                            idx = speaker_names_tuple.index(speaker)
+                            colors = ["blue", "green", "orange", "red"]
+                            color = colors[idx % len(colors)]
+                        except ValueError:
+                            color = "gray"
+                            
                         st.markdown(f"**:{color}[{speaker}]:** {text}")
 
             from utils import batch_synthesize_audio
@@ -260,7 +293,7 @@ if st.session_state.extracted_content:
                             st.code(smi_output)
                     
                 with st.spinner("Synthesizing audio segments using Kokoro..."):
-                    audio_paths = batch_synthesize_audio(script, model=tts_model)
+                    audio_paths = batch_synthesize_audio(script)
                     st.session_state.audio_segments = audio_paths
             
             if st.session_state.audio_segments:
