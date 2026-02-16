@@ -1,13 +1,12 @@
 import os
 import gc
 import subprocess
-
-import streamlit as st
-from openai import OpenAI
-import google.generativeai as genai
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 from huggingface_hub import login
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # ... existing constants ...
 PROVIDER_OPENAI = "OpenAI"
@@ -20,9 +19,17 @@ MODEL_GEMINI_PRO = "gemini-1.5-pro"
 MODEL_LOCAL_3B = "meta-llama/Llama-3.2-3B-Instruct"
 MODEL_LOCAL_1B = "meta-llama/Llama-3.2-1B-Instruct"
 
-@st.cache_resource
+# Global cache
+_LOCAL_PIPELINE = None
+_LOADED_MODEL_ID = None
+
 def get_local_model_pipeline(model_id):
     """Loads a local model pipeline efficiently."""
+    global _LOCAL_PIPELINE, _LOADED_MODEL_ID
+    
+    if _LOCAL_PIPELINE is not None and _LOADED_MODEL_ID == model_id:
+        return _LOCAL_PIPELINE
+
     try:
         # Authenticate with Hugging Face if token is present
         hf_token = os.getenv("HF_TOKEN")
@@ -48,23 +55,21 @@ def get_local_model_pipeline(model_id):
             repetition_penalty=1.1,
             do_sample=True,
         )
+        
+        _LOCAL_PIPELINE = pipe
+        _LOADED_MODEL_ID = model_id
         return pipe
     except Exception as e:
-        st.error(f"Error loading local model {model_id}: {e}")
+        print(f"Error loading local model {model_id}: {e}")
         return None
 
 def unload_local_model():
     """Unloads the local model from memory and clears CUDA cache."""
-    # Clear streamlit cache for the model loading function
-    get_local_model_pipeline.clear()
+    global _LOCAL_PIPELINE, _LOADED_MODEL_ID
     
-    # Remove from session state if it exists
-    if "local_pipeline" in st.session_state:
-        del st.session_state.local_pipeline
+    _LOCAL_PIPELINE = None
+    _LOADED_MODEL_ID = None
     
-    if "loaded_model_name" in st.session_state:
-        st.session_state.loaded_model_name = None
-        
     # Force garbage collection
     gc.collect()
     
@@ -72,7 +77,7 @@ def unload_local_model():
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
     
-    st.info("Local LLM unloaded to free up memory for TTS.")
+    print("Local LLM unloaded to free up memory for TTS.")
     
     # Run nvidia-smi to check VRAM
     try:
@@ -128,7 +133,11 @@ def query_llm(messages: list[dict], provider: str, model_name: str, api_key: str
 
     elif provider == PROVIDER_LOCAL:
         if not local_pipeline:
-             raise ValueError("Local model pipeline not initialized.")
+             # Fallback to global pipeline
+             if _LOCAL_PIPELINE:
+                 local_pipeline = _LOCAL_PIPELINE
+             else:
+                 raise ValueError("Local model pipeline not initialized.")
         
         try:
             outputs = local_pipeline(

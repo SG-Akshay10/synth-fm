@@ -81,9 +81,21 @@ def extract_json_from_response(response: str) -> List[Dict]:
         start_idx = response.find('[')
         end_idx = response.rfind(']')
         
+        if start_idx != -1:
+            json_str = response[start_idx:]
+            try:
+                parsed, _ = json.JSONDecoder().raw_decode(json_str)
+                return parsed
+            except:
+                # If raw_decode fails, fall back to other methods or try finding the last ]
+                pass
+                
         if start_idx != -1 and end_idx != -1:
             json_str = response[start_idx:end_idx + 1]
-            return json.loads(json_str)
+            try:
+                return json.loads(json_str)
+            except:
+                pass
         
         # If no array, try to extract multiple JSON objects
         # Look for pattern: {...}\n{...}

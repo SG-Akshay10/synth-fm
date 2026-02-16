@@ -1,0 +1,37 @@
+
+name: synth-fm-gpu
+channels:
+  - pytorch
+  - nvidia
+  - defaults
+dependencies:
+  - python=3.10
+  - pytorch
+  - torchvision
+  - torchaudio
+  - pytorch-cuda=11.8
+  - pip
+  - pip:
+    - fastapi
+    - uvicorn[standard]
+    - python-multipart
+    - transformers
+    - accelerate
+    - sentencepiece
+    - soundfile
+    - librosa
+    - numpy
+    - scipy
+    - pydub
+    - google-generativeai
+    - openai
+    - requests
+    - python-dotenv
+    - pydantic
+    - pydantic-settings
+    - kokoro-onnx
+    - beautifulsoup4
+    - PyPDF2
+    - python-docx
+    - markdown
+    - nest_asyncio
