@@ -2,7 +2,7 @@ import React from 'react';
 import { Mic, Settings, Sliders, Box, Cpu } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-export const Sidebar = ({ config, onConfigChange, onLoadModel, onUnloadModel, modelLoading, modelLoaded }) => {
+export const Sidebar = ({ config, onConfigChange, onModelLoad, onModelUnload, modelLoading, loadedModel }) => {
     const handleChange = (field, value) => {
         onConfigChange({ ...config, [field]: value });
     };
@@ -13,18 +13,23 @@ export const Sidebar = ({ config, onConfigChange, onLoadModel, onUnloadModel, mo
         handleChange('speakers', newSpeakers);
     };
 
+    // Helper to verify if configuration has speakers array before mapping
+    const speakers = config.speakers || [];
+
+    const isCurrentModelLoaded = loadedModel === config.modelName;
+
     return (
-        <div className="w-80 bg-black/40 backdrop-blur-xl border-r border-white/5 h-full flex flex-col">
+        <aside className="w-80 bg-background/50 backdrop-blur-2xl border-r border-white/5 h-full flex flex-col shadow-2xl z-50">
             {/* Header */}
-            <div className="p-6 border-b border-white/5 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
-                    <Mic className="text-white" size={20} />
+            <div className="p-6 border-b border-white/5 flex items-center gap-4">
+                <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center shadow-[0_0_15px_rgba(98,71,234,0.2)] border border-primary/20">
+                    <Mic className="text-primary" size={20} />
                 </div>
                 <div>
-                    <h1 className="font-bold text-lg tracking-tight bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+                    <h1 className="font-bold text-lg tracking-tight text-white">
                         Synth-FM
                     </h1>
-                    <p className="text-xs text-gray-500 font-medium">AI Podcast Generator</p>
+                    <p className="text-xs text-white/50 font-medium">AI Podcast Generator</p>
                 </div>
             </div>
 
@@ -33,16 +38,16 @@ export const Sidebar = ({ config, onConfigChange, onLoadModel, onUnloadModel, mo
 
                 {/* Model Section */}
                 <section className="space-y-4">
-                    <div className="flex items-center gap-2 text-sm font-medium text-gray-400 uppercase tracking-wider">
-                        <Cpu size={14} /> Model Provider
+                    <div className="flex items-center gap-2 text-xs font-bold text-white/40 uppercase tracking-widest">
+                        <Cpu size={12} /> Model Provider
                     </div>
 
                     <div className="grid grid-cols-1 gap-2">
                         {["local", "openai", "gemini"].map(p => (
                             <label key={p} className={`
-                relative flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200 border
+                relative flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 border
                 ${config.provider === p
-                                    ? 'bg-white/10 border-violet-500/50 shadow-[0_0_15px_rgba(139,92,246,0.1)]'
+                                    ? 'bg-primary/10 border-primary/30 shadow-[0_0_15px_rgba(98,71,234,0.1)]'
                                     : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/10'}
               `}>
                                 <input
@@ -53,11 +58,11 @@ export const Sidebar = ({ config, onConfigChange, onLoadModel, onUnloadModel, mo
                                     onChange={(e) => handleChange('provider', e.target.value)}
                                     className="hidden"
                                 />
-                                <div className={`w-4 h-4 rounded-full border flex items-center justify-center
-                  ${config.provider === p ? 'border-violet-500' : 'border-gray-600'}`}>
-                                    {config.provider === p && <div className="w-2 h-2 rounded-full bg-violet-500" />}
+                                <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors duration-300
+                  ${config.provider === p ? 'border-primary' : 'border-white/20'}`}>
+                                    {config.provider === p && <div className="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_rgba(98,71,234,0.8)]" />}
                                 </div>
-                                <span className="capitalize font-medium text-sm text-gray-200">{p}</span>
+                                <span className={`capitalize font-medium text-sm transition-colors duration-300 ${config.provider === p ? 'text-white' : 'text-white/60'}`}>{p}</span>
                             </label>
                         ))}
                     </div>
@@ -68,42 +73,47 @@ export const Sidebar = ({ config, onConfigChange, onLoadModel, onUnloadModel, mo
                             placeholder="API Key"
                             value={config.apiKey}
                             onChange={(e) => handleChange('apiKey', e.target.value)}
-                            className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/50 transition-all placeholder:text-gray-600"
+                            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all placeholder:text-white/20 text-white"
                         />
                     )}
 
-                    <select
-                        value={config.modelName}
-                        onChange={(e) => handleChange('modelName', e.target.value)}
-                        className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-violet-500/50 transition-all text-gray-300 appearance-none cursor-pointer hover:bg-white/5"
-                    >
-                        {config.provider === 'local' ? (
-                            <>
-                                <option value="local_3b">Llama-3.2-3B</option>
-                                <option value="local_1b">Llama-3.2-1B</option>
-                            </>
-                        ) : config.provider === 'openai' ? (
-                            <>
-                                <option value="gpt-4o">GPT-4o</option>
-                                <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                            </>
-                        ) : (
-                            <>
-                                <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
-                                <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
-                            </>
-                        )}
-                    </select>
+                    <div className="relative">
+                        <select
+                            value={config.modelName}
+                            onChange={(e) => handleChange('modelName', e.target.value)}
+                            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-primary/50 transition-all text-white appearance-none cursor-pointer hover:bg-white/10"
+                        >
+                            {config.provider === 'local' ? (
+                                <>
+                                    <option value="local_3b" className="bg-[#07001F]">Llama-3.2-3B</option>
+                                    <option value="local_1b" className="bg-[#07001F]">Llama-3.2-1B</option>
+                                </>
+                            ) : config.provider === 'openai' ? (
+                                <>
+                                    <option value="gpt-4o" className="bg-[#07001F]">GPT-4o</option>
+                                    <option value="gpt-3.5-turbo" className="bg-[#07001F]">GPT-3.5 Turbo</option>
+                                </>
+                            ) : (
+                                <>
+                                    <option value="gemini-1.5-flash" className="bg-[#07001F]">Gemini 1.5 Flash</option>
+                                    <option value="gemini-1.5-pro" className="bg-[#07001F]">Gemini 1.5 Pro</option>
+                                </>
+                            )}
+                        </select>
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-white/40">
+                            <Box size={14} />
+                        </div>
+                    </div>
 
                     {config.provider === 'local' && (
-                        <div className="mt-2">
+                        <div className="mt-2 text-center">
                             <div className="flex gap-2">
                                 <button
-                                    onClick={onLoadModel}
-                                    disabled={modelLoading || modelLoaded}
-                                    className={`flex-1 py-2.5 px-3 rounded-lg text-xs font-medium transition-all ${modelLoaded
-                                        ? "bg-green-500/10 text-green-400 border border-green-500/20 cursor-default"
-                                        : "bg-violet-600 hover:bg-violet-500 text-white shadow-lg shadow-violet-900/20"
+                                    onClick={onModelLoad}
+                                    disabled={modelLoading || isCurrentModelLoaded}
+                                    className={`flex-1 py-2.5 px-3 rounded-lg text-xs font-bold uppercase tracking-wide transition-all ${isCurrentModelLoaded
+                                        ? "bg-accent/10 text-accent border border-accent/20 cursor-default shadow-[0_0_15px_rgba(0,255,128,0.1)]"
+                                        : "bg-primary hover:bg-primary/90 text-white shadow-[0_0_20px_rgba(98,71,234,0.3)] hover:shadow-[0_0_30px_rgba(98,71,234,0.5)]"
                                         }`}
                                 >
                                     {modelLoading ? (
@@ -111,61 +121,64 @@ export const Sidebar = ({ config, onConfigChange, onLoadModel, onUnloadModel, mo
                                             <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
                                             Loading...
                                         </span>
-                                    ) : modelLoaded ? (
-                                        "Model Loaded"
+                                    ) : isCurrentModelLoaded ? (
+                                        "Model Ready"
+                                    ) : loadedModel ? (
+                                        "Switch Model"
                                     ) : (
                                         "Load Model"
                                     )}
                                 </button>
-                                {modelLoaded && (
+                                {loadedModel && (
                                     <button
-                                        onClick={onUnloadModel}
-                                        className="py-2.5 px-3 rounded-lg text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-all"
+                                        onClick={onModelUnload}
+                                        className="py-2.5 px-3 rounded-lg text-xs font-bold uppercase tracking-wide bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-all hover:shadow-[0_0_15px_rgba(239,68,68,0.2)]"
                                         title="Unload Model to free VRAM"
                                     >
                                         Unload
                                     </button>
                                 )}
                             </div>
-                            {!modelLoaded && <p className="text-[10px] text-gray-500 mt-1.5 text-center">First run may take time to download weights.</p>}
+                            {!isCurrentModelLoaded && <p className="text-[10px] text-white/30 mt-2">Initial load may take a moment</p>}
                         </div>
                     )}
                 </section>
 
                 {/* Podcast Settings */}
                 <section className="space-y-4">
-                    <div className="flex items-center gap-2 text-sm font-medium text-gray-400 uppercase tracking-wider">
-                        <Sliders size={14} /> Configuration
+                    <div className="flex items-center gap-2 text-xs font-bold text-white/40 uppercase tracking-widest">
+                        <Sliders size={12} /> Configuration
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-xs text-gray-500">Podcast Name</label>
+                        <label className="text-xs text-white/40 font-medium ml-1">Podcast Name</label>
                         <input
                             type="text"
                             value={config.podcastName}
                             onChange={(e) => handleChange('podcastName', e.target.value)}
-                            className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-violet-500/50 transition-all"
+                            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-primary/50 transition-all text-white placeholder:text-white/20"
+                            placeholder="My Awesome Podcast"
                         />
                     </div>
 
-                    <div className="space-y-2">
-                        <div className="flex justify-between">
-                            <label className="text-xs text-gray-500">Duration</label>
-                            <span className="text-xs text-violet-400 font-mono">{config.duration} min</span>
+                    <div className="space-y-3 pt-2">
+                        <div className="flex justify-between items-end">
+                            <label className="text-xs text-white/40 font-medium ml-1">Duration</label>
+                            <span className="text-xs text-primary font-mono bg-primary/10 px-2 py-0.5 rounded border border-primary/20">{config.duration} min</span>
                         </div>
                         <input
                             type="range"
                             min="2" max="10"
                             value={config.duration}
                             onChange={(e) => handleChange('duration', parseInt(e.target.value))}
-                            className="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-violet-500"
+                            className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-primary hover:accent-primary/80"
                         />
                     </div>
 
-                    <div className="space-y-2">
-                        <div className="flex justify-between">
-                            <label className="text-xs text-gray-500">Number of Speakers</label>
-                            <span className="text-xs text-violet-400 font-mono">{config.numSpeakers}</span>
+                    <div className="space-y-3 pt-2">
+                        <div className="flex justify-between items-end">
+                            <label className="text-xs text-white/40 font-medium ml-1">Speakers</label>
+                            <span className="text-xs text-primary font-mono bg-primary/10 px-2 py-0.5 rounded border border-primary/20">{config.numSpeakers}</span>
                         </div>
                         <input
                             type="range"
@@ -173,7 +186,7 @@ export const Sidebar = ({ config, onConfigChange, onLoadModel, onUnloadModel, mo
                             value={config.numSpeakers}
                             onChange={(e) => {
                                 const num = parseInt(e.target.value);
-                                const newSpeakers = [...config.speakers];
+                                const newSpeakers = [...speakers];
                                 if (num > newSpeakers.length) {
                                     for (let i = newSpeakers.length; i < num; i++) {
                                         newSpeakers.push({ name: `Speaker ${i + 1}`, gender: "Female" });
@@ -187,28 +200,28 @@ export const Sidebar = ({ config, onConfigChange, onLoadModel, onUnloadModel, mo
                                     speakers: newSpeakers
                                 });
                             }}
-                            className="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-violet-500"
+                            className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-primary hover:accent-primary/80"
                         />
                     </div>
 
-                    <div className="space-y-3">
-                        <label className="text-xs text-gray-500">Speaker Details</label>
-                        {config.speakers.map((speaker, idx) => (
-                            <div key={idx} className="flex gap-2 p-2 rounded-lg bg-white/5 border border-white/5">
+                    <div className="space-y-2 pt-2">
+                        <label className="text-xs text-white/40 font-medium ml-1">Speaker Details</label>
+                        {speakers.map((speaker, idx) => (
+                            <div key={idx} className="flex gap-2 p-1.5 rounded-lg bg-white/5 border border-white/5 focus-within:border-white/10 transition-colors">
                                 <input
                                     value={speaker.name}
                                     onChange={(e) => handleSpeakerChange(idx, 'name', e.target.value)}
-                                    className="w-full bg-transparent border-none text-xs text-white focus:outline-none placeholder:text-gray-600"
+                                    className="w-full bg-transparent border-none text-xs text-white focus:outline-none placeholder:text-white/20 pl-2"
                                     placeholder="Name"
                                 />
-                                <div className="w-px bg-white/10 mx-1" />
+                                <div className="w-px bg-white/10 my-1" />
                                 <select
                                     value={speaker.gender}
                                     onChange={(e) => handleSpeakerChange(idx, 'gender', e.target.value)}
-                                    className="bg-transparent border-none text-xs text-gray-400 focus:outline-none cursor-pointer hover:text-white"
+                                    className="bg-transparent border-none text-xs text-white/60 focus:outline-none cursor-pointer hover:text-white pr-1"
                                 >
-                                    <option value="Male">M</option>
-                                    <option value="Female">F</option>
+                                    <option value="Male" className="bg-[#07001F]">M</option>
+                                    <option value="Female" className="bg-[#07001F]">F</option>
                                 </select>
                             </div>
                         ))}
@@ -219,8 +232,8 @@ export const Sidebar = ({ config, onConfigChange, onLoadModel, onUnloadModel, mo
 
             {/* Footer */}
             <div className="p-4 border-t border-white/5 bg-black/20">
-                <p className="text-[10px] text-gray-600 text-center">v1.0.0 • Powered by LLMs</p>
+                <p className="text-[10px] text-white/30 text-center">v1.0.0 • Yeldra Style</p>
             </div>
-        </div>
+        </aside>
     );
 };

@@ -6,24 +6,25 @@ export const AppLayout = ({
     children,
     config,
     onConfigChange,
-    onLoadModel,
-    onUnloadModel,
+    onModelLoad,
+    onModelUnload,
     modelLoading,
-    modelLoaded
+    loadedModel
 }) => {
     return (
-        <div className="flex h-screen overflow-hidden bg-[#050505] text-white">
+        <div className="flex h-screen overflow-hidden bg-transparent text-white">
             <Sidebar
                 config={config}
                 onConfigChange={onConfigChange}
-                onLoadModel={onLoadModel}
-                onUnloadModel={onUnloadModel}
+                onModelLoad={onModelLoad}
+                onModelUnload={onModelUnload}
                 modelLoading={modelLoading}
-                modelLoaded={modelLoaded}
+                loadedModel={loadedModel}
             />
-            <div className="flex-1 flex flex-col h-full relative overflow-hidden bg-dot-pattern">
+            <div className="flex-1 flex flex-col h-full relative overflow-hidden">
                 {/* Ambient background effects */}
-                <div className="absolute top-0 left-0 right-0 h-96 bg-gradient-to-b from-violet-900/10 to-transparent pointer-events-none" />
+                <div className="absolute top-[-20%] left-[20%] w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px] pointer-events-none opacity-40 mix-blend-screen" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-accent/10 rounded-full blur-[100px] pointer-events-none opacity-30 mix-blend-screen" />
 
                 <main className="flex-1 overflow-y-auto relative z-10 scroll-smooth">
                     <div className="max-w-7xl mx-auto p-6 md:p-8 lg:p-10 space-y-8 pb-32">

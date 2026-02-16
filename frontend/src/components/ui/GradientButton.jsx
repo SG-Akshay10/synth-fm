@@ -12,10 +12,11 @@ export const GradientButton = ({
     ...props
 }) => {
     const variants = {
-        primary: "bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-lg shadow-purple-500/20",
-        secondary: "bg-white/10 hover:bg-white/20 text-white border border-white/10 backdrop-blur-sm",
+        primary: "bg-primary hover:bg-primary/90 text-white shadow-[0_0_20px_rgba(98,71,234,0.3)] hover:shadow-[0_0_30px_rgba(98,71,234,0.5)] border border-white/10",
+        secondary: "bg-white/5 hover:bg-white/10 text-white border border-white/10 backdrop-blur-sm",
+        accent: "bg-accent hover:bg-accent/90 text-background font-semibold shadow-[0_0_20px_rgba(0,255,128,0.3)] hover:shadow-[0_0_30px_rgba(0,255,128,0.5)]",
         danger: "bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20",
-        ghost: "bg-transparent hover:bg-white/5 text-gray-300 hover:text-white"
+        ghost: "bg-transparent hover:bg-white/5 text-gray-400 hover:text-white"
     };
 
     return (
@@ -24,7 +25,7 @@ export const GradientButton = ({
             whileTap={{ scale: 0.98 }}
             disabled={disabled || loading}
             className={cn(
-                "relative flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed",
+                "relative flex items-center justify-center gap-2 rounded-full px-6 py-3 font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed",
                 variants[variant],
                 className
             )}
