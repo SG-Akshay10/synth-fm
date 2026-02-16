@@ -87,6 +87,7 @@ export const Sidebar = ({ config, onConfigChange, onModelLoad, onModelUnload, mo
                                 <>
                                     <option value="local_3b" className="bg-[#07001F]">Llama-3.2-3B</option>
                                     <option value="local_1b" className="bg-[#07001F]">Llama-3.2-1B</option>
+                                    <option value="local_qwen_1_5b" className="bg-[#07001F]">Qwen2-1.5B</option>
                                 </>
                             ) : config.provider === 'openai' ? (
                                 <>

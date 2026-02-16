@@ -1,10 +1,11 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from backend.utils.llm import get_local_model_pipeline, unload_local_model, MODEL_LOCAL_3B, MODEL_LOCAL_1B
+from backend.utils.llm import get_local_model_pipeline, unload_local_model, MODEL_LOCAL_3B, MODEL_LOCAL_1B, MODEL_LOCAL_QWEN_1_5B
 
 MODEL_MAPPING = {
     "local_3b": MODEL_LOCAL_3B,
-    "local_1b": MODEL_LOCAL_1B
+    "local_1b": MODEL_LOCAL_1B,
+    "local_qwen_1_5b": MODEL_LOCAL_QWEN_1_5B
 }
 
 router = APIRouter()

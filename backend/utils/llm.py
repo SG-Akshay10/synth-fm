@@ -2,7 +2,7 @@ import os
 import gc
 import subprocess
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModel, pipeline
 from huggingface_hub import login
 from dotenv import load_dotenv
 
@@ -18,6 +18,7 @@ MODEL_GEMINI_PRO = "gemini-1.5-pro"
 
 MODEL_LOCAL_3B = "meta-llama/Llama-3.2-3B-Instruct"
 MODEL_LOCAL_1B = "meta-llama/Llama-3.2-1B-Instruct"
+MODEL_LOCAL_QWEN_1_5B = "MaziyarPanahi/Qwen2-1.5B-Instruct-GGUF"
 
 # Global cache
 _LOCAL_PIPELINE = None
@@ -38,12 +39,16 @@ def get_local_model_pipeline(model_id):
         
         tokenizer = AutoTokenizer.from_pretrained(model_id)
         
-        # dynamic device map and quantization
-        model = AutoModelForCausalLM.from_pretrained(
-            model_id,
-            torch_dtype=torch.bfloat16 if torch.cuda.is_available() and torch.cuda.is_bf16_supported() else torch.float16,
-            device_map="auto",
-        )
+        if "GGUF" in model_id:
+            # Load model directly as requested for GGUF
+            model = AutoModel.from_pretrained(model_id, dtype="auto")
+        else:
+            # dynamic device map and quantization for standard models
+            model = AutoModelForCausalLM.from_pretrained(
+                model_id,
+                torch_dtype=torch.bfloat16 if torch.cuda.is_available() and torch.cuda.is_bf16_supported() else torch.float16,
+                device_map="auto",
+            )
         
         pipe = pipeline(
             "text-generation",
