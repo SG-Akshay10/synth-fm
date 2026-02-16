@@ -112,10 +112,17 @@ with st.sidebar:
     
     st.caption("Speaker Names")
     speaker_names = []
+    speaker_genders = {}
     default_names = ["Alex", "Bailey", "Casey", "Devin"]
     for i in range(num_speakers):
-        name = st.text_input(f"Speaker {i+1}", value=default_names[i], key=f"speaker_name_{i}")
+        col1, col2 = st.columns([2, 1])
+        with col1:
+            name = st.text_input(f"Speaker {i+1}", value=default_names[i], key=f"speaker_name_{i}")
+        with col2:
+            gender = st.selectbox("Gender", options=["Female", "Male"], index=0, key=f"speaker_gender_{i}")
+        
         speaker_names.append(name)
+        speaker_genders[name] = gender
     
 
     st.divider()
@@ -293,7 +300,7 @@ if st.session_state.extracted_content:
                             st.code(smi_output)
                     
                 with st.spinner("Synthesizing audio segments using Kokoro..."):
-                    audio_paths = batch_synthesize_audio(script,unique_speakers)
+                    audio_paths = batch_synthesize_audio(script, unique_speakers, speaker_genders)
                     st.session_state.audio_segments = audio_paths
             
             if st.session_state.audio_segments:

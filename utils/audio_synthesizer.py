@@ -18,8 +18,11 @@ def get_kokoro_pipeline():
         _KOKORO_PIPELINE = KPipeline(lang_code='a')
     return _KOKORO_PIPELINE
 
-# Default voices for dynamic mapping
-VOICE_LIST = ["af_heart", "am_adam", "af_bella", "am_michael"]
+# Default voices for dynamic mapping (Expanded for variety)
+VOICE_LIST = [
+    "af_bella", "af_nicole", "af_sky", "bf_emma",  # Female voices
+    "am_adam", "am_michael", "bm_george", "bm_lewis"  # Male voices
+]
 
 def synthesize_segment_kokoro(segment_index: int, speaker: str, text: str, voice_id: str) -> str:
     """Synthesize a single audio segment using Kokoro TTS (Sync)."""
@@ -49,17 +52,41 @@ def synthesize_segment_kokoro(segment_index: int, speaker: str, text: str, voice
         print(f"Error synthesizing segment {segment_index} (Kokoro): {e}")
         return None
 
-def batch_synthesize_audio(script: dict, unique_speakers: list[str]) -> list[str]:
+def batch_synthesize_audio(script: dict, unique_speakers: list[str], speaker_genders: dict[str, str] = None) -> list[str]:
     """Process all dialogue segments sequentially for Kokoro."""
     dialogue = script.get("dialogue", [])
     results = []
     
-    # Create a mapping from speaker name to voice_id
-    # We take the first N voices from VOICE_LIST where N is the number of unique speakers
-    voice_mapping = {
-        name: VOICE_LIST[i % len(VOICE_LIST)] 
-        for i, name in enumerate(unique_speakers)
-    }
+    # Categorize voices
+    female_voices = [v for v in VOICE_LIST if v.startswith("af_")]
+    male_voices = [v for v in VOICE_LIST if v.startswith("am_")]
+    
+    # Create a mapping from speaker name to voice_id ensuring uniqueness
+    voice_mapping = {}
+    used_voices = set()
+    
+    for name in unique_speakers:
+        gender = speaker_genders.get(name, "Female") if speaker_genders else "Female"
+        
+        target_pool = female_voices if gender == "Female" else male_voices
+        other_pool = male_voices if gender == "Female" else female_voices
+        
+        # 1. Try unused voice of preferred gender
+        voice_id = next((v for v in target_pool if v not in used_voices), None)
+        
+        # 2. Fallback to unused voice of other gender
+        if not voice_id:
+            voice_id = next((v for v in other_pool if v not in used_voices), None)
+            
+        # 3. Last fallback (reuse): pick a voice of preferred gender (if pool not empty)
+        if not voice_id:
+            if target_pool:
+                voice_id = target_pool[0]  # Just pick the first one of preferred gender
+            else:
+                voice_id = VOICE_LIST[0]   # Global fallback
+                
+        voice_mapping[name] = voice_id
+        used_voices.add(voice_id)
     
     for i, turn in enumerate(dialogue):
         speaker = turn.get("speaker")
