@@ -1,64 +1,168 @@
-# Synth-FM: AI Podcast Generator
+# 🎙️ Synth-FM: AI-Powered Podcast Generator
 
-Turn your reading list into an engaging podcast using local or cloud LLMs and high-quality TTS.
+> **Turn your reading list into an engaging, multi-speaker podcast.**
 
-## 🚀 New Architecture
+![Synth-FM Banner](https://placeholder.com/banner.png) *(Replace with actual banner/screenshot)*
 
-This project has been migrated to a modern web stack:
-- **Backend**: FastAPI (Python) for AI/ML operations.
-- **Frontend**: React + Vite + Tailwind CSS for a responsive UI.
-- **AI Models**: Support for Local LLMs (Llama 3.2), OpenAI, and Gemini.
+**Synth-FM** is an advanced AI audio synthesis platform that transforms written content—articles, research papers, documentation, and blog posts—into professional-quality podcasts. It leverages state-of-the-art LLMs (OpenAI, Gemini, Local Llama) to generate natural, conversational scripts and high-fidelity TTS (Kokoro) to bring them to life with multiple distinct speakers.
 
-## 🛠️ Setup Instructions
+## ✨ Key Features
+
+-   **🗣️ Natural Multi-Speaker Conversations**: Automatically generates dynamic dialogue between 2-4 hosts (e.g., The Enthusiast, The Skeptic, The Expert).
+-   **📚 Multi-Source Ingestion**:
+    -   **URLs**: Paste links from Medium, Substack, News sites, etc.
+    -   **Documents**: Upload PDF, DOCX, TXT, or MD files.
+-   **🧠 Intelligent Script Generation**: Uses advanced prompt engineering to create engaging scripts with humor, debate, and insight.
+-   **🎧 High-Fidelity Audio**: Powered by **Kokoro TTS** for realistic voice synthesis that rivals human speech.
+-   **⚡ Modern Architecture**: Built with a robust **FastAPI** backend and a reactive **React + Vite** frontend.
+-   **🤖 flexible AI Models**:
+    -   **Cloud**: OpenAI (GPT-4o), Google Gemini 1.5.
+    -   **Local**: Run completely offline with Llama 3.2 and local TTS (requires GPU).
+
+## 🛠️ Tech Stack
+
+### Frontend
+-   **Framework**: [React](https://react.dev/) + [Vite](https://vitejs.dev/)
+-   **Styling**: [Tailwind CSS](https://tailwindcss.com/) + [Lucide React](https://lucide.dev/) (Icons)
+-   **State Management**: React Hooks
+-   **HTTP Client**: Axios
+
+### Backend
+-   **Framework**: [FastAPI](https://fastapi.tiangolo.com/) (Python 3.10+)
+-   **Server**: Uvicorn
+-   **AI Orchestration**: LangChain (implied/custom logic)
+-   **TTS**: Kokoro (Onnx/PyTorch)
+-   **Data Processing**: Trafilatura (Scraping), PyPDF2, python-docx
+
+## 🚀 Installation & Setup
+
+Follow these steps to get Synth-FM running locally.
 
 ### Prerequisites
-- Conda (Miniconda or Anaconda)
-- Node.js (v18+)
+-   **Python 3.10+** (Conda recommended)
+-   **Node.js v18+** & `npm`
+-   **Git**
+-   *(Optional)* **NVIDIA GPU** for local model inference.
 
-### 1. Backend Setup
+### 1️⃣ Clone the Repository
 
 ```bash
-# Create and activate the conda environment
+git clone https://github.com/yourusername/synth-fm.git
+cd synth-fm
+```
+
+### 2️⃣ Backend Setup
+
+We recommend using Conda to manage dependencies, especially for GPU support.
+
+```bash
+# Create and activate the environment
 conda env create -f backend/environment.yml
 conda activate synth-fm-gpu
 
-# Start the Backend Server
-uvicorn backend.main:app --reload
+# Alternatively, using pip:
+# pip install -r backend/requirements.txt
 ```
-The backend API will run at `http://localhost:8000`.
 
-### 2. Frontend Setup
+**Set up Environment Variables:**
+
+Create a `.env` file in the root directory (copy from `.env.template` if available):
 
 ```bash
-# Navigate to frontend directory
+cp .env.template .env
+```
+
+Edit `.env` and add your API keys:
+
+```env
+OPENAI_API_KEY=sk-...
+GEMINI_API_KEY=...
+HF_TOKEN=... (Optional, for gated models)
+```
+
+**Start the Backend Server:**
+
+```bash
+uvicorn backend.main:app --reload
+```
+The API will be available at `http://localhost:8000`. Documentation at `http://localhost:8000/docs`.
+
+### 3️⃣ Frontend Setup
+
+Open a new terminal window.
+
+```bash
 cd frontend
 
 # Install dependencies
 npm install
 
-# Start the Development Server
+# Start the development server
 npm run dev
 ```
-The frontend UI will run at `http://localhost:5173`.
 
-## 📝 Usage
+The UI will be running at `http://localhost:5173`.
 
-1.  **Select Provider**: Choose between Local LLM, OpenAI, or Gemini.
-2.  **Configuration**: Set API keys (if needed) and customize podcast duration/speakers.
-3.  **Add Content**: Paste URLs or upload documents (PDF, DOCX, TXT).
-4.  **Process**: Click "Process Content" to extract text.
-5.  **Generate Script**: Create a dialogue script from the content.
-6.  **Synthesize**: Generate audio using Kokoro TTS (high quality).
-7.  **Listen**: Play the final podcast directly in the browser or download the WAV file.
+## 📖 Usage Guide
 
-## 📁 Project Structure
+1.  **Open the App**: Navigate to `http://localhost:5173`.
+2.  **Configure Podcast**:
+    -   **Duration**: Select 2, 5, or 10 minutes.
+    -   **Model**: Choose between OpenAI, Gemini, or Local.
+    -   **Speakers**: Select your host personalities.
+3.  **Add Content**:
+    -   Paste URLs into the input field.
+    -   Or drag & drop PDF/DOCX files.
+4.  **Generate**: Click **"Generate Podcast"**.
+    -   *Step 1*: Content is extracted and cleaned.
+    -   *Step 2*: LLM generates a script.
+    -   *Step 3*: TTS synthesizes audio.
+5.  **Listen & Download**: Play the podcast in the built-in player or download the `.wav`/`.mp3` file.
 
-- `backend/`: FastAPI application code.
-    - `api/endpoints/`: API route handlers.
-    - `utils/`: Core logic for extraction, LLM, and TTS.
-- `frontend/`: React application code.
-    - `src/`: Components and logic.
+## 📂 Project Structure
 
-## ⚠️ Notes
-- The "Local" provider requires a GPU with sufficient VRAM (approx 4GB-8GB depending on model).
-- First run with Local LLM or Kokoro TTS will download model weights.
+```
+synth-fm/
+├── backend/                # FastAPI Application
+│   ├── api/                # API Routes (Endpoints)
+│   ├── utils/              # Core Logic (LLM, TTS, Extraction)
+│   ├── main.py             # App Entry Point
+│   └── environment.yml     # Conda Environment
+├── frontend/               # React Application
+│   ├── src/
+│   │   ├── components/     # Reusable UI Components
+│   │   ├── pages/          # Page Views
+│   │   └── App.jsx         # Main Component
+│   ├── package.json        # Frontend Dependencies
+│   └── vite.config.js      # Vite Configuration
+├── data/                   # Data Storage (Temp)
+│   ├── temp/               # Temporary Audio Segments
+│   └── output/             # Final Podcasts
+├── README.md               # Project Documentation
+└── LICENSE                 # MIT License
+```
+
+## 🗺️ Roadmap
+
+- [ ] **Mobile App**: React Native version for on-the-go listening.
+- [ ] **RSS Feeds**: Personal podcast feeds for generated content.
+- [ ] **Voice Cloning**: Upload your own voice sample for a host.
+- [ ] **User Accounts**: Save history and preferences.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1.  Fork the repository.
+2.  Create a feature branch (`git checkout -b feature/amazing-feature`).
+3.  Commit your changes (`git commit -m 'Add amazing feature'`).
+4.  Push to the branch (`git push origin feature/amazing-feature`).
+5.  Open a Pull Request.
+
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+**Built with ❤️ by Akshay SG.**
