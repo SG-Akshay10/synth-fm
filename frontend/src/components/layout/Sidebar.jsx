@@ -43,7 +43,7 @@ export const Sidebar = ({ config, onConfigChange, onModelLoad, onModelUnload, mo
                     </div>
 
                     <div className="grid grid-cols-1 gap-2">
-                        {["local", "openai", "gemini", "groq"].map(p => (
+                        {["openai", "gemini", "groq"].map(p => (
                             <label key={p} className={`
                 relative flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 border
                 ${config.provider === p
