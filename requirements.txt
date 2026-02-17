@@ -8,24 +8,24 @@ python-docx>=1.1.0
 google-genai>=0.3.0
 python-dotenv>=1.0.0
 nest_asyncio>=1.5.8
-transformers>=4.40.0
+# transformers>=4.40.0
 torch>=2.2.0
-accelerate>=0.29.0
-bitsandbytes>=0.43.0
+# accelerate>=0.29.0
+# bitsandbytes>=0.43.0
 huggingface_hub>=0.23.0
 openai>=1.0.0
-kokoro>=0.3.4
-kokoro-onnx
-soundfile>=0.12.1
-scipy>=1.13.0
-numpy
+# kokoro>=0.3.4
+# kokoro-onnx
+# soundfile>=0.12.1
+# scipy>=1.13.0
+# numpy
 librosa
 pydub
 pydantic
 pydantic-settings
 beautifulsoup4
 markdown
-sentencepiece
-tiktoken
-gguf>=0.10.0
-groq>=0.5.0
+# sentencepiece
+# tiktoken
+# gguf>=0.10.0
+# groq>=0.5.0
