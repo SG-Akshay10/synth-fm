@@ -15,7 +15,6 @@ WORKDIR /home/user/app
 RUN apt-get update && apt-get install -y \
     build-essential \
     curl \
-    software-properties-common \
     git \
     espeak-ng \
     ffmpeg \
@@ -25,6 +24,8 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
+
+RUN python -m spacy download en_core_web_sm
 
 # Copy the rest of the application code
 COPY --chown=user:user . .

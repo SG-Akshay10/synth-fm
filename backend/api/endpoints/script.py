@@ -1,13 +1,14 @@
 from fastapi import APIRouter, HTTPException
 from backend.schemas import ScriptRequest, ScriptResponse, ScriptResponse
 from backend.utils.script_generator import generate_script
-from backend.utils.llm import PROVIDER_OPENAI, PROVIDER_GEMINI, PROVIDER_LOCAL
+from backend.utils.llm import PROVIDER_OPENAI, PROVIDER_GEMINI, PROVIDER_LOCAL, PROVIDER_GROQ, MODEL_GROQ_LLAMA_3_1_8B_INSTANT, MODEL_GEMINI_FLASH, GEMINI_MODELS
 import os
 
 PROVIDER_MAPPING = {
     "openai": PROVIDER_OPENAI,
     "gemini": PROVIDER_GEMINI,
-    "local": PROVIDER_LOCAL
+    "local": PROVIDER_LOCAL,
+    "groq": PROVIDER_GROQ
 }
 
 router = APIRouter()
@@ -20,10 +21,25 @@ async def generate_podcast_script(request: ScriptRequest):
         "valid": True
     }
     
+    provider = PROVIDER_MAPPING.get(request.provider, request.provider)
+    model_name = request.model_name
+
+    # Sanitize model name for Groq if it receives a local model name
+    if provider == PROVIDER_GROQ:
+        if not model_name or "local" in model_name.lower() or model_name == "undefined":
+            print(f"Sanitizing Groq model name: replaced '{model_name}' with '{MODEL_GROQ_LLAMA_3_1_8B_INSTANT}'")
+            model_name = MODEL_GROQ_LLAMA_3_1_8B_INSTANT
+
+    # Sanitize model name for Gemini if it receives a local model name or invalid model
+    if provider == PROVIDER_GEMINI:
+         if model_name not in GEMINI_MODELS:
+            print(f"Sanitizing Gemini model name: replaced '{model_name}' with '{MODEL_GEMINI_FLASH}' (Valid models: {GEMINI_MODELS})")
+            model_name = MODEL_GEMINI_FLASH
+
     llm_config = {
-        "provider": PROVIDER_MAPPING.get(request.provider, request.provider),
+        "provider": provider,
         "api_key": request.api_key,
-        "model_name": request.model_name
+        "model_name": model_name
     }
     
     # If local provider is used, we need to handle loading the pipeline or ensure it's loaded.
