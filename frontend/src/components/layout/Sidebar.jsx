@@ -43,7 +43,7 @@ export const Sidebar = ({ config, onConfigChange, onModelLoad, onModelUnload, mo
                     </div>
 
                     <div className="grid grid-cols-1 gap-2">
-                        {["local", "openai", "gemini"].map(p => (
+                        {["local", "openai", "gemini", "groq"].map(p => (
                             <label key={p} className={`
                 relative flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 border
                 ${config.provider === p
@@ -94,10 +94,14 @@ export const Sidebar = ({ config, onConfigChange, onModelLoad, onModelUnload, mo
                                     <option value="gpt-4o" className="bg-[#07001F]">GPT-4o</option>
                                     <option value="gpt-3.5-turbo" className="bg-[#07001F]">GPT-3.5 Turbo</option>
                                 </>
+                            ) : config.provider === 'gemini' ? (
+                                <>
+                                    <option value="gemini-3-flash-preview" className="bg-[#07001F]">Gemini 3 Flash Preview</option>
+                                    <option value="gemini-3-pro-preview" className="bg-[#07001F]">Gemini 3 Pro Preview</option>
+                                </>
                             ) : (
                                 <>
-                                    <option value="gemini-1.5-flash" className="bg-[#07001F]">Gemini 1.5 Flash</option>
-                                    <option value="gemini-1.5-pro" className="bg-[#07001F]">Gemini 1.5 Pro</option>
+                                    <option value="llama-3.1-8b-instant" className="bg-[#07001F]">Llama 3.1 8B Instant</option>
                                 </>
                             )}
                         </select>
