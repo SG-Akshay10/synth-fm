@@ -210,3 +210,6 @@ __marimo__/
 /data/temp
 /data/output
 /tests
+
+test.py
+frontend/.env.production

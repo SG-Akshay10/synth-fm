@@ -10,9 +10,9 @@ import { API_BASE_URL } from '../lib/config'
 export const PodcastGenerator = () => {
     // Configuration State
     const [config, setConfig] = useState({
-        provider: "local",
+        provider: "gemini",
         apiKey: "",
-        modelName: "local_3b",
+        modelName: "gemini-3-flash-preview",
         duration: 2,
         numSpeakers: 2,
         podcastName: "Synth-FM",
