@@ -19,10 +19,12 @@ def get_kokoro_pipeline():
     return _KOKORO_PIPELINE
 
 # Default voices for dynamic mapping (Expanded for variety)
-VOICE_LIST = [
-    "af_bella", "af_nicole", "af_sky", "bf_emma",  # Female voices
-    "am_adam", "am_michael", "bm_george", "bm_lewis"  # Male voices
-]
+# Explicitly separated voice lists
+FEMALE_VOICES = ["af_bella", "af_nicole", "af_sky", "bf_emma"]
+MALE_VOICES = ["am_adam", "am_michael", "bm_george", "bm_lewis"]
+
+# Combined list for backwards compatibility or fallbacks if needed
+VOICE_LIST = FEMALE_VOICES + MALE_VOICES
 
 def synthesize_segment_kokoro(segment_index: int, speaker: str, text: str, voice_id: str) -> str:
     """Synthesize a single audio segment using Kokoro TTS (Sync)."""
@@ -57,10 +59,6 @@ def batch_synthesize_audio(script: dict, unique_speakers: list[str], speaker_gen
     dialogue = script.get("dialogue", [])
     results = []
     
-    # Categorize voices
-    female_voices = [v for v in VOICE_LIST if v.startswith("af_")]
-    male_voices = [v for v in VOICE_LIST if v.startswith("am_")]
-    
     # Create a mapping from speaker name to voice_id ensuring uniqueness
     voice_mapping = {}
     used_voices = set()
@@ -68,22 +66,32 @@ def batch_synthesize_audio(script: dict, unique_speakers: list[str], speaker_gen
     for name in unique_speakers:
         gender = speaker_genders.get(name, "Female") if speaker_genders else "Female"
         
-        target_pool = female_voices if gender == "Female" else male_voices
-        other_pool = male_voices if gender == "Female" else female_voices
+        # strict gender selection
+        if gender == "Female":
+            target_pool = FEMALE_VOICES
+            other_pool = MALE_VOICES
+        else: # Male
+            target_pool = MALE_VOICES
+            other_pool = FEMALE_VOICES
         
         # 1. Try unused voice of preferred gender
         voice_id = next((v for v in target_pool if v not in used_voices), None)
         
-        # 2. Fallback to unused voice of other gender
+        # 2. If all preferred gender voices are used, reuse one from preferred gender (Round Robin)
+        # We prefer reusing a correct-gendered voice over switching gender
         if not voice_id:
-            voice_id = next((v for v in other_pool if v not in used_voices), None)
-            
-        # 3. Last fallback (reuse): pick a voice of preferred gender (if pool not empty)
-        if not voice_id:
-            if target_pool:
-                voice_id = target_pool[0]  # Just pick the first one of preferred gender
-            else:
-                voice_id = VOICE_LIST[0]   # Global fallback
+             # Find the least used voice of the correct gender? 
+             # For simplicity, just pick one that is already used but correct gender.
+             # Or purely random from target_pool. 
+             # Let's just pick from target_pool[0] as fallback, or rotate?
+             # Let's just pick the first available one to ensure gender correctness.
+             if target_pool:
+                 voice_id = target_pool[0]
+             else:
+                 # Should practically never happen unless lists are empty
+                 voice_id = VOICE_LIST[0]
+
+        # Note: We deliberately DO NOT fallback to `other_pool` to avoid gender confusion.
                 
         voice_mapping[name] = voice_id
         used_voices.add(voice_id)

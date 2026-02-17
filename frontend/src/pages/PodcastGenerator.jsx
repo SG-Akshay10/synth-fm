@@ -19,7 +19,10 @@ export const PodcastGenerator = () => {
         speakers: [
             { name: "Alex", gender: "Female" },
             { name: "Bailey", gender: "Male" }
-        ]
+        ],
+        tone: "Fun & Engaging",
+        customInstructions: "",
+        useCustomInstructions: false
     })
 
     // Content State
@@ -138,7 +141,9 @@ export const PodcastGenerator = () => {
                 speaker_names: config.speakers.map(s => s.name),
                 provider: config.provider,
                 api_key: config.apiKey,
-                model_name: config.modelName
+                model_name: config.modelName,
+                tone: config.tone,
+                custom_instructions: config.useCustomInstructions ? config.customInstructions : null
             })
             setScript(res.data)
             setStatusMessage("Script generated!")

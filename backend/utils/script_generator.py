@@ -167,7 +167,7 @@ def extract_topic_from_chunk(chunk: str, llm_config: dict) -> str:
         return "General Discussion"
 
 
-def generate_chunk_dialogue(chunk: str, topic: str, llm_config: dict, speakers: List[Dict]) -> List[Dict]:
+def generate_chunk_dialogue(chunk: str, topic: str, llm_config: dict, speakers: List[Dict], tone: str = "Fun & Engaging", custom_instructions: str = None) -> List[Dict]:
     """
     Generate 250-300 word dialogue for a single chunk.
     NO intro, NO outro - just the main content discussion.
@@ -179,6 +179,9 @@ def generate_chunk_dialogue(chunk: str, topic: str, llm_config: dict, speakers: 
             "role": "system",
             "content": f"""You are a podcast script writer. Create engaging dialogue between these hosts:
             {speakers_desc}
+
+            TONE: {tone}
+            {f"CUSTOM INSTRUCTIONS: {custom_instructions}" if custom_instructions else ""}
 
             CRITICAL RULES:
             1. Generate 250-300 words of dialogue
@@ -389,12 +392,15 @@ def generate_intro_outro(main_script: List[Dict], llm_config: dict, speakers: Li
         return [], []
 
 
-def generate_single_call_script(content: str, duration: int, llm_config: dict, speakers: List[Dict]) -> List[Dict]:
+def generate_single_call_script(content: str, duration: int, llm_config: dict, speakers: List[Dict], tone: str = "Fun & Engaging", custom_instructions: str = None) -> List[Dict]:
     """
     Generate complete script (with intro and outro) in a single LLM call.
     Used for small content (≤ 800 words).
     """
-    target_words = duration * 150  # Approximate words per minute
+    # Strict word count limit based on duration (200 words per minute)
+    max_words = duration * 200
+    target_words = max_words  # Aim for the limit
+    
     speakers_desc, json_format = get_speaker_formatting(speakers)
 
     messages = [
@@ -403,11 +409,15 @@ def generate_single_call_script(content: str, duration: int, llm_config: dict, s
             "content": f"""You are a podcast script writer. Create engaging dialogue between these hosts:
 {speakers_desc}
 
-Make it conversational, informative, and engaging."""
+TONE: {tone}
+{f"CUSTOM INSTRUCTIONS: {custom_instructions}" if custom_instructions else ""}
+
+Make it conversational, informative, and engaging.
+Strictly adhere to the word count limit."""
         },
         {
             "role": "user",
-            "content": f"""Create a {duration}-minute podcast script (approximately {target_words} words) based on this content:
+            "content": f"""Create a {duration}-minute podcast script (MAXIMUM {max_words} words) based on this content:
 
 {content}
 
@@ -440,7 +450,7 @@ Include:
         return []
 
 
-def generate_script(content_data: dict, duration: int, llm_config: dict, num_speakers: int = 2, podcast_name: str = "Synth-FM", custom_speaker_names: List[str] = None) -> dict:
+def generate_script(content_data: dict, duration: int, llm_config: dict, num_speakers: int = 2, podcast_name: str = "Synth-FM", custom_speaker_names: List[str] = None, tone: str = "Fun & Engaging", custom_instructions: str = None) -> dict:
     """
     Main orchestrator function for script generation.
     
@@ -465,7 +475,7 @@ def generate_script(content_data: dict, duration: int, llm_config: dict, num_spe
 
         if word_count <= CHUNK_THRESHOLD:
             print("Using single LLM call approach (small content)")
-            dialogue = generate_single_call_script(content, duration, llm_config, speakers)
+            dialogue = generate_single_call_script(content, duration, llm_config, speakers, tone, custom_instructions)
         else:
             print("Using multi-chunk approach (large content)")
             
@@ -483,7 +493,7 @@ def generate_script(content_data: dict, duration: int, llm_config: dict, num_spe
                 print(f"Topic: {topic}")
                 
                 # Generate dialogue
-                chunk_dialogue = generate_chunk_dialogue(chunk, topic, llm_config, speakers)
+                chunk_dialogue = generate_chunk_dialogue(chunk, topic, llm_config, speakers, tone, custom_instructions)
                 if chunk_dialogue:
                     chunk_dialogues.append(chunk_dialogue)
             

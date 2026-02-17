@@ -249,6 +249,65 @@ export const Sidebar = ({ config, onConfigChange, onModelLoad, onModelUnload, mo
                     </div>
 
                 </section>
+
+                {/* Content Style Section */}
+                <section className="space-y-4">
+                    <div className="flex items-center gap-2 text-xs font-bold text-white/40 uppercase tracking-widest">
+                        <Sliders size={12} /> Content Style
+                    </div>
+
+                    {/* Tone Selection */}
+                    <div className="space-y-2">
+                        <label className="text-xs text-white/40 font-medium ml-1">Tone</label>
+                        <div className="grid grid-cols-2 gap-2">
+                            {["Fun & Engaging", "Informative", "Serious", "Educational", "Casual", "Storytelling"].map(tone => (
+                                <button
+                                    key={tone}
+                                    onClick={() => handleChange('tone', tone)}
+                                    className={`px-3 py-2 rounded-lg text-xs font-medium transition-all ${config.tone === tone
+                                        ? 'bg-primary text-white shadow-[0_0_15px_rgba(98,71,234,0.3)]'
+                                        : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
+                                        }`}
+                                >
+                                    {tone}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Custom Instructions */}
+                    <div className="space-y-2 pt-2">
+                        <label className="flex items-center gap-2 cursor-pointer group">
+                            <input
+                                type="checkbox"
+                                checked={config.useCustomInstructions}
+                                onChange={(e) => handleChange('useCustomInstructions', e.target.checked)}
+                                className="w-4 h-4 rounded border-white/20 bg-white/5 text-primary focus:ring-primary/50 transition-all"
+                            />
+                            <span className={`text-xs font-medium transition-colors ${config.useCustomInstructions ? 'text-white' : 'text-white/60 group-hover:text-white/80'}`}>
+                                Custom Instructions
+                            </span>
+                        </label>
+
+                        <AnimatePresence>
+                            {config.useCustomInstructions && (
+                                <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: "auto", opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    className="overflow-hidden"
+                                >
+                                    <textarea
+                                        value={config.customInstructions}
+                                        onChange={(e) => handleChange('customInstructions', e.target.value)}
+                                        placeholder="E.g., Act like Adam Sandler, focus on the technical details, use simple metaphors..."
+                                        className="w-full h-24 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder:text-white/20 focus:outline-none focus:border-primary/50 transition-all resize-none"
+                                    />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                </section>
             </div>
 
             {/* Footer */}
