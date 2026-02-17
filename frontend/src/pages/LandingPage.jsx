@@ -17,8 +17,8 @@ export const LandingPage = () => {
             {/* Navbar */}
             <nav className="relative z-50 flex items-center justify-between px-6 py-6 max-w-7xl mx-auto">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center shadow-[0_0_15px_rgba(98,71,234,0.2)] border border-primary/20">
-                        <Mic className="text-primary" size={20} />
+                    <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center shadow-[0_0_15px_rgba(98,71,234,0.2)] border border-primary/20 overflow-hidden">
+                        <img src="/logo-transparent.png" alt="Synth-FM" className="w-full h-full object-cover p-1" />
                     </div>
                     <span className="font-bold text-xl tracking-tight">Synth-FM</span>
                 </div>
