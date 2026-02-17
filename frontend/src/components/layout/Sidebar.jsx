@@ -24,8 +24,8 @@ export const Sidebar = ({ config, onConfigChange, onModelLoad, onModelUnload, mo
             {/* Header */}
             <div className="p-6 border-b border-white/5 flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center shadow-[0_0_15px_rgba(98,71,234,0.2)] border border-primary/20">
-                        <Mic className="text-primary" size={20} />
+                    <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center shadow-[0_0_15px_rgba(98,71,234,0.2)] border border-primary/20 overflow-hidden">
+                        <img src="/logo-transparent.png" alt="Synth-FM Logo" className="w-full h-full object-cover p-1" />
                     </div>
                     <div>
                         <h1 className="font-bold text-lg tracking-tight text-white">
