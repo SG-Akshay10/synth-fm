@@ -192,9 +192,9 @@ export const PodcastGenerator = () => {
             modelLoading={modelLoading}
             loadedModel={loadedModel}
         >
-            <header className="flex justify-between items-center pb-8">
+            <header className="flex flex-col md:flex-row justify-between items-center gap-4 pb-8 text-center md:text-left">
                 <div>
-                    <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-white to-white/50 bg-clip-text text-transparent tracking-tight">
+                    <h1 className="text-4xl md:text-4xl font-bold bg-gradient-to-r from-white via-white to-white/50 bg-clip-text text-transparent tracking-tight">
                         {config.podcastName}
                     </h1>
                     <p className="text-white/50 text-sm mt-2 font-light tracking-wide">Create studio-quality podcasts with AI</p>

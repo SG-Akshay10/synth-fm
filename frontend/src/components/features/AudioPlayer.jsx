@@ -79,20 +79,22 @@ export const AudioPlayer = ({ audioPath, onDownload }) => {
                             </a>
                         </div>
 
-                        <div className="flex items-center gap-4">
-                            <button onClick={() => audioRef.current.currentTime -= 10} className="text-gray-400 hover:text-white transition-colors"><SkipBack size={20} /></button>
-                            <button
-                                onClick={togglePlay}
-                                className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-transform shadow-lg shadow-white/20"
-                            >
-                                {isPlaying ? <Pause size={24} fill="currentColor" /> : <Play size={24} fill="currentColor" className="ml-1" />}
-                            </button>
-                            <button onClick={() => audioRef.current.currentTime += 10} className="text-gray-400 hover:text-white transition-colors"><SkipForward size={20} /></button>
+                        <div className="flex flex-col-reverse md:flex-row items-center gap-4 md:gap-6">
+                            <div className="flex items-center gap-4 md:gap-6 w-full md:w-auto justify-center">
+                                <button onClick={() => audioRef.current.currentTime -= 10} className="text-gray-400 hover:text-white transition-colors p-2"><SkipBack size={20} /></button>
+                                <button
+                                    onClick={togglePlay}
+                                    className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-transform shadow-lg shadow-white/20 shrink-0"
+                                >
+                                    {isPlaying ? <Pause size={24} fill="currentColor" /> : <Play size={24} fill="currentColor" className="ml-1" />}
+                                </button>
+                                <button onClick={() => audioRef.current.currentTime += 10} className="text-gray-400 hover:text-white transition-colors p-2"><SkipForward size={20} /></button>
+                            </div>
 
                             {/* Progress & Time */}
-                            <div className="flex-1 flex flex-col gap-1">
+                            <div className="flex-1 flex flex-col gap-2 w-full">
                                 <div
-                                    className="h-1.5 bg-white/10 rounded-full cursor-pointer relative group"
+                                    className="h-2 bg-white/10 rounded-full cursor-pointer relative group"
                                     onClick={handleSeek}
                                 >
                                     <div

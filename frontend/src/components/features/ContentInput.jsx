@@ -16,8 +16,8 @@ export const ContentInput = ({
 }) => {
     return (
         <GlassCard className="w-full">
-            <div className="flex items-center gap-3 mb-6">
-                <div className="w-8 h-8 rounded-full bg-violet-500/20 flex items-center justify-center text-violet-400">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
+                <div className="w-8 h-8 rounded-full bg-violet-500/20 flex items-center justify-center text-violet-400 shrink-0">
                     <Upload size={18} />
                 </div>
                 <div>
@@ -52,7 +52,7 @@ export const ContentInput = ({
                                 {urls.length > 1 && (
                                     <button
                                         onClick={() => onRemoveUrl(i)}
-                                        className="w-10 flex items-center justify-center rounded-lg border border-white/5 bg-white/5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/20 transition-all"
+                                        className="w-10 flex items-center justify-center rounded-lg border border-white/5 bg-white/5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/20 transition-all shrink-0"
                                     >
                                         <Trash2 size={18} />
                                     </button>

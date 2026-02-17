@@ -42,14 +42,14 @@ export const LandingPage = () => {
             </nav>
 
             {/* Hero Section */}
-            <main className="relative z-10 pt-20 pb-32 px-6">
-                <div className="max-w-4xl mx-auto text-center space-y-8">
+            <main className="relative z-10 pt-20 pb-20 md:pb-32 px-6">
+                <div className="max-w-4xl mx-auto text-center space-y-6 md:space-y-8">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, ease: "easeOut" }}
                     >
-                        <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.1]">
+                        <h1 className="text-4xl md:text-7xl font-bold tracking-tight leading-[1.1]">
                             Turn Content into <br />
                             <span className="bg-gradient-to-r from-primary via-white to-accent bg-clip-text text-transparent">
                                 Studio-Quality Podcasts
@@ -61,7 +61,7 @@ export const LandingPage = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.2 }}
-                        className="text-lg md:text-xl text-white/50 max-w-2xl mx-auto leading-relaxed"
+                        className="text-base md:text-xl text-white/50 max-w-2xl mx-auto leading-relaxed"
                     >
                         Transform articles, PDFs, and links into engaging audio conversations using advanced AI.
                         Powered by LLMs and neural text-to-speech.
@@ -74,7 +74,7 @@ export const LandingPage = () => {
                         className="flex items-center justify-center gap-4 pt-4"
                     >
                         <Link to="/app">
-                            <GradientButton className="text-lg px-8 py-4 h-auto shadow-[0_0_40px_rgba(98,71,234,0.4)] hover:shadow-[0_0_60px_rgba(98,71,234,0.6)]">
+                            <GradientButton className="text-base md:text-lg px-6 md:px-8 py-3 md:py-4 h-auto shadow-[0_0_40px_rgba(98,71,234,0.4)] hover:shadow-[0_0_60px_rgba(98,71,234,0.6)]">
                                 Start Creating <ArrowRight size={20} />
                             </GradientButton>
                         </Link>
@@ -82,33 +82,33 @@ export const LandingPage = () => {
                 </div>
 
                 {/* Features Grid */}
-                <div id="features" className="max-w-7xl mx-auto mt-32 grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <GlassCard className="p-8 space-y-4 hover:bg-white/5 transition-colors group">
+                <div id="features" className="max-w-7xl mx-auto mt-20 md:mt-32 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                    <GlassCard className="p-6 md:p-8 space-y-4 hover:bg-white/5 transition-colors group">
                         <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                             <FileText className="text-primary" size={24} />
                         </div>
-                        <h3 className="text-xl font-bold">Multi-Format Input</h3>
-                        <p className="text-white/50 leading-relaxed">
+                        <h3 className="text-lg md:text-xl font-bold">Multi-Format Input</h3>
+                        <p className="text-sm md:text-base text-white/50 leading-relaxed">
                             Upload PDFs, text files, or paste URLs. We intelligently extract and process content from any source.
                         </p>
                     </GlassCard>
 
-                    <GlassCard className="p-8 space-y-4 hover:bg-white/5 transition-colors group">
+                    <GlassCard className="p-6 md:p-8 space-y-4 hover:bg-white/5 transition-colors group">
                         <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
                             <Zap className="text-accent" size={24} />
                         </div>
-                        <h3 className="text-xl font-bold">AI Scriptwriting</h3>
-                        <p className="text-white/50 leading-relaxed">
+                        <h3 className="text-lg md:text-xl font-bold">AI Scriptwriting</h3>
+                        <p className="text-sm md:text-base text-white/50 leading-relaxed">
                             Our LLM agents generate natural, engaging dialogues between hosts, optimized for audio retention.
                         </p>
                     </GlassCard>
 
-                    <GlassCard className="p-8 space-y-4 hover:bg-white/5 transition-colors group">
+                    <GlassCard className="p-6 md:p-8 space-y-4 hover:bg-white/5 transition-colors group">
                         <div className="w-12 h-12 rounded-lg bg-indigo-500/10 flex items-center justify-center group-hover:bg-indigo-500/20 transition-colors">
                             <Headphones className="text-indigo-400" size={24} />
                         </div>
-                        <h3 className="text-xl font-bold">Neural Voice Synthesis</h3>
-                        <p className="text-white/50 leading-relaxed">
+                        <h3 className="text-lg md:text-xl font-bold">Neural Voice Synthesis</h3>
+                        <p className="text-sm md:text-base text-white/50 leading-relaxed">
                             Hyper-realistic AI voices with emotional depth and proper pacing. It sounds just like a real podcast.
                         </p>
                     </GlassCard>

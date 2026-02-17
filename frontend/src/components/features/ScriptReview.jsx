@@ -1,5 +1,5 @@
 import React from 'react';
-import { Share, Play, Sparkles } from 'lucide-react';
+import { Share, Play, Sparkles, FileText } from 'lucide-react';
 import { GlassCard } from '../ui/GlassCard';
 import { GradientButton } from '../ui/GradientButton';
 import { motion } from 'framer-motion';
@@ -38,7 +38,7 @@ export const ScriptReview = ({ content, script, onGenerateScript, onSynthesize, 
             {/* Extracted Content View */}
             {content && !script && (
                 <GlassCard>
-                    <div className="flex justify-between items-center mb-4">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
                         <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">
                                 <FileText size={18} />
@@ -86,8 +86,6 @@ export const ScriptReview = ({ content, script, onGenerateScript, onSynthesize, 
                         {script.dialogue.map((turn, i) => {
                             const speakerIndex = speakers.findIndex(s => s.name === turn.speaker);
                             const colorTheme = SPEAKER_COLORS[speakerIndex % SPEAKER_COLORS.length] || SPEAKER_COLORS[0];
-                            const isOdd = i % 2 !== 0; // Alternating sides for visual flow, or keep all left?
-                            // Let's keep the left/right alternation based on speaker index for clear separation
                             const isRight = speakerIndex % 2 !== 0;
 
                             return (
@@ -96,7 +94,7 @@ export const ScriptReview = ({ content, script, onGenerateScript, onSynthesize, 
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: i * 0.05 }}
                                     key={i}
-                                    className={`flex gap-4 ${isRight ? 'flex-row-reverse' : 'flex-row'}`}
+                                    className={`flex gap-3 sm:gap-4 ${isRight ? 'flex-row-reverse' : 'flex-row'}`}
                                 >
                                     <div className={`
                        w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0
@@ -130,6 +128,3 @@ export const ScriptReview = ({ content, script, onGenerateScript, onSynthesize, 
         </div>
     );
 };
-
-// Missing icon fix
-import { FileText } from 'lucide-react';

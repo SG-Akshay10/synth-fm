@@ -1,8 +1,8 @@
 import React from 'react';
-import { Mic, Settings, Sliders, Box, Cpu } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Mic, Settings, Sliders, Box, Cpu, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-export const Sidebar = ({ config, onConfigChange, onModelLoad, onModelUnload, modelLoading, loadedModel }) => {
+export const Sidebar = ({ config, onConfigChange, onModelLoad, onModelUnload, modelLoading, loadedModel, isOpen, onClose }) => {
     const handleChange = (field, value) => {
         onConfigChange({ ...config, [field]: value });
     };
@@ -18,19 +18,29 @@ export const Sidebar = ({ config, onConfigChange, onModelLoad, onModelUnload, mo
 
     const isCurrentModelLoaded = loadedModel === config.modelName;
 
-    return (
-        <aside className="w-80 bg-background/50 backdrop-blur-2xl border-r border-white/5 h-full flex flex-col shadow-2xl z-50">
+    // Sidebar Content Component
+    const SidebarContent = () => (
+        <aside className="w-80 bg-background/95 backdrop-blur-2xl border-r border-white/5 h-full flex flex-col shadow-2xl">
             {/* Header */}
-            <div className="p-6 border-b border-white/5 flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center shadow-[0_0_15px_rgba(98,71,234,0.2)] border border-primary/20">
-                    <Mic className="text-primary" size={20} />
+            <div className="p-6 border-b border-white/5 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center shadow-[0_0_15px_rgba(98,71,234,0.2)] border border-primary/20">
+                        <Mic className="text-primary" size={20} />
+                    </div>
+                    <div>
+                        <h1 className="font-bold text-lg tracking-tight text-white">
+                            Synth-FM
+                        </h1>
+                        <p className="text-xs text-white/50 font-medium">AI Podcast Generator</p>
+                    </div>
                 </div>
-                <div>
-                    <h1 className="font-bold text-lg tracking-tight text-white">
-                        Synth-FM
-                    </h1>
-                    <p className="text-xs text-white/50 font-medium">AI Podcast Generator</p>
-                </div>
+                {/* Mobile Close Button */}
+                <button
+                    onClick={onClose}
+                    className="md:hidden p-2 text-white/60 hover:text-white transition-colors"
+                >
+                    <X size={20} />
+                </button>
             </div>
 
             {/* Scrollable Config Area */}
@@ -246,5 +256,40 @@ export const Sidebar = ({ config, onConfigChange, onModelLoad, onModelUnload, mo
                 <p className="text-[10px] text-white/30 text-center">v1.0.0 • Yeldra Style</p>
             </div>
         </aside>
+    );
+
+    return (
+        <>
+            {/* Desktop Sidebar */}
+            <div className="hidden md:block h-full z-50">
+                <SidebarContent />
+            </div>
+
+            {/* Mobile Sidebar (Drawer) */}
+            <AnimatePresence>
+                {isOpen && (
+                    <>
+                        {/* Backdrop */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={onClose}
+                            className="md:hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50"
+                        />
+                        {/* Drawer */}
+                        <motion.div
+                            initial={{ x: "-100%" }}
+                            animate={{ x: 0 }}
+                            exit={{ x: "-100%" }}
+                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                            className="md:hidden fixed inset-y-0 left-0 w-80 z-50"
+                        >
+                            <SidebarContent />
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+        </>
     );
 };
