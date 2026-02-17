@@ -62,7 +62,9 @@ async def generate_podcast_script(request: ScriptRequest):
             llm_config=llm_config,
             num_speakers=request.num_speakers,
             podcast_name=request.podcast_name,
-            custom_speaker_names=request.speaker_names
+            custom_speaker_names=request.speaker_names,
+            tone=request.tone,
+            custom_instructions=request.custom_instructions
         )
         
         if "error" in script:

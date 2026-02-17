@@ -20,6 +20,8 @@ class ScriptRequest(BaseModel):
     provider: str
     api_key: Optional[str] = None
     model_name: str
+    tone: Optional[str] = "Fun & Engaging"
+    custom_instructions: Optional[str] = None
 
 class DialogueTurn(BaseModel):
     speaker: str
